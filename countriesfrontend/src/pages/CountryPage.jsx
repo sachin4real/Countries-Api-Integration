@@ -7,7 +7,7 @@ function CountryPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`https://restcountries.com/v3.1/name/${countryName}?fullText=true`)
+    fetch(`http://localhost:5001/api/countries/name/${countryName}`)  
       .then((response) => {
         if (!response.ok) {
           throw new Error('Country not found');

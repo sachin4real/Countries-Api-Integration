@@ -6,8 +6,8 @@ function AllCountriesPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch all countries
-    fetch('https://restcountries.com/v3.1/all')
+    // Fetch all countries from the backend API
+    fetch('http://localhost:5001/api/countries/all')  // Changed to backend route
       .then((response) => response.json())
       .then((data) => setCountries(data))
       .catch((err) => {
