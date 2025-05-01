@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';  // Importing Axios
 import CountryCard from '../components/CountryCard';
 
 function AllCountriesPage() {
@@ -6,14 +7,16 @@ function AllCountriesPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch all countries from the backend API
-    fetch('http://localhost:5001/api/countries/all')  // Changed to backend route
-      .then((response) => response.json())
-      .then((data) => setCountries(data))
+    // Fetch all countries using Axios
+    axios.get('http://localhost:5001/api/countries/all')  // Backend API endpoint
+      .then((response) => {
+        setCountries(response.data);  // Set the countries in the state
+      })
       .catch((err) => {
-        setError('Failed to load countries');
+        setError('Failed to load countries');  // Set error if API call fails
+        console.error(err);
       });
-  }, []);
+  }, []);  // Empty dependency array to only run on component mount
 
   if (error) {
     return <div className="text-red-500 text-center">{error}</div>;

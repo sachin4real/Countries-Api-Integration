@@ -1,31 +1,47 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 function CountryPage() {
   const { countryName } = useParams();
   const [country, setCountry] = useState(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
-    fetch(`http://localhost:5001/api/countries/name/${countryName}`)  
+    // Set loading to true before data fetch
+    setLoading(true);
+    axios.get(`http://localhost:5001/api/countries/name/${countryName}`)
       .then((response) => {
-        if (!response.ok) {
-          throw new Error('Country not found');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setCountry(data[0]);
-        setError(null);
+        setCountry(response.data[0]);  // Set country data
+        setError(null);  // Clear previous errors
       })
       .catch((err) => {
-        setError(err.message);
-        setCountry(null);
+        setError('Country not found');  // Set error if country not found
+        setCountry(null);  // Clear country data
+      })
+      .finally(() => {
+        setLoading(false);  // Set loading to false once data is fetched
       });
   }, [countryName]);
 
-  if (error) return <div className="text-red-500 text-center mt-10">{error}</div>;
-  if (!country) return <div className="text-center mt-10 text-lg">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#1B5D4C] to-[#5B7F72] text-white">
+        <h2 className="text-3xl font-bold">Loading country details...</h2>
+      </div>
+    );  // Display loading message with the gradient background
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#1B5D4C] to-[#5B7F72] text-white">
+        <h2 className="text-3xl font-bold">{error}</h2>  {/* Error message with gradient */}
+      </div>
+    );  // Display error message with the gradient background
+  }
+
+  if (!country) return <div className="text-center mt-10 text-lg">No data available.</div>;
 
   const languages = country.languages ? Object.values(country.languages).join(', ') : 'N/A';
   const currencies = country.currencies ? Object.values(country.currencies).map(curr => curr.name).join(', ') : 'N/A';

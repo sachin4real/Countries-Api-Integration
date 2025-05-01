@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import React, { useState } from 'react'; // <-- Add this line
-
+import React, { useState } from 'react';
 
 function SearchBar() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,8 +11,10 @@ function SearchBar() {
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
-    if (searchTerm) {
+    if (searchTerm.trim()) {  // Ensure that the search term isn't empty
       navigate(`/country/${searchTerm}`);
+    } else {
+      alert("Please enter a country name.");
     }
   };
 
