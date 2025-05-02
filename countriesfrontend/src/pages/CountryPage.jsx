@@ -11,7 +11,7 @@ function CountryPage() {
   useEffect(() => {
     // Set loading to true before data fetch
     setLoading(true);
-    axios.get(`http://localhost:5001/api/countries/name/${countryName}`)
+    axios.get(`http://localhost:5002/api/countries/name/${countryName}`)
       .then((response) => {
         setCountry(response.data[0]);  // Set country data
         setError(null);  // Clear previous errors

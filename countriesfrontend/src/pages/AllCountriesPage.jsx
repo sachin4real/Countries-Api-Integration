@@ -8,7 +8,7 @@ function AllCountriesPage() {
 
   useEffect(() => {
     // Fetch all countries using Axios
-    axios.get('http://localhost:5001/api/countries/all')  // Backend API endpoint
+    axios.get('http://localhost:5002/api/countries/all')  // Backend API endpoint
       .then((response) => {
         setCountries(response.data);  // Set the countries in the state
       })
