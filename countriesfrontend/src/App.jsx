@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ErrorPage from "./components/ErrorPage";
-
 import HomePage from "./pages/HomePage";
 import CountryPage from "./pages/CountryPage";
 import AllCountriesPage from "./pages/AllCountriesPage"; // New page for all countries
