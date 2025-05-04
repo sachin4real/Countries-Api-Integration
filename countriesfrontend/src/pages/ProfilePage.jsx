@@ -67,4 +67,3 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
-tton
