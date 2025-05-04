@@ -14,7 +14,7 @@ function App() {
   return (
     <Router>
       <Navbar />
-      <div className="pt-10"> {/* Add padding to offset fixed navbar */}
+      <div className="pt-10"> 
       <Routes>
         {/* Home page route */}
         <Route path="/" element={<HomePage />} />
