@@ -1,62 +1,77 @@
 // src/redux/authActions.js
-import { setUser, setLoading, setError } from './userSlice';
-import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '../../firebase'; // Modular imports
+import { setUser, setLoading, setError, setFavorites } from './userSlice';
+import {
+  auth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  db,
+} from '../../firebase';
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { updateProfile, signOut } from 'firebase/auth';
 
-// Register User Action
 export const registerUser = (email, password) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password); // Firebase register
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Store only relevant user data (uid, email, displayName)
+    await updateProfile(user, { displayName: email.split('@')[0] });
+
+    // Create empty favorites doc in Firestore
+    await setDoc(doc(db, "favorites", user.uid), { items: [] });
+
     const userData = {
       uid: user.uid,
       email: user.email,
-      displayName: user.displayName || "No Display Name", // Default name if not available
+      displayName: user.displayName || 'User',
     };
 
-    dispatch(setUser(userData)); // Store user data in Redux state
+    dispatch(setUser(userData));
+    dispatch(setFavorites([]));
     dispatch(setLoading(false));
   } catch (error) {
-    dispatch(setError(error.message)); // Set error in Redux state
+    dispatch(setError(error.message));
     dispatch(setLoading(false));
-    throw error; // Throw error to be handled in component
+    throw error;
   }
 };
 
-// Login User Action
 export const loginUser = (email, password) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
-    const userCredential = await signInWithEmailAndPassword(auth, email, password); // Firebase login
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Store only relevant user data
+    // Load favorites from Firestore
+    const docRef = doc(db, "favorites", user.uid);
+    const docSnap = await getDoc(docRef);
+    const favorites = docSnap.exists() ? docSnap.data().items : [];
+
     const userData = {
       uid: user.uid,
       email: user.email,
-      displayName: user.displayName || "No Display Name", // Default name if not available
+      displayName: user.displayName || 'User',
     };
 
-    dispatch(setUser(userData)); // Store user data in Redux state
+    dispatch(setUser(userData));
+    dispatch(setFavorites(favorites));
     dispatch(setLoading(false));
   } catch (error) {
-    dispatch(setError(error.message)); // Set error in Redux state
+    dispatch(setError(error.message));
     dispatch(setLoading(false));
-    throw error; // Throw error to be handled in component
+    throw error;
   }
 };
 
-// Logout User Action
 export const logoutUser = () => async (dispatch) => {
   try {
     dispatch(setLoading(true));
-    await auth.signOut(); // Firebase logout
-    dispatch(setUser(null)); // Clear user data from Redux state
+    await signOut(auth);
+    dispatch(setUser(null));
+    dispatch(setFavorites([]));
     dispatch(setLoading(false));
   } catch (error) {
-    dispatch(setError(error.message)); // Set error in Redux state
+    dispatch(setError(error.message));
     dispatch(setLoading(false));
   }
 };

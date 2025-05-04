@@ -1,10 +1,13 @@
+// src/redux/userSlice.js
 import { createSlice } from '@reduxjs/toolkit';
+import { db } from '../../firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 const initialState = {
-  user: null,  // Only store relevant user data (uid, email, etc.)
+  user: null,
   loading: false,
   error: null,
-  favorites: [],  // Array to store favorite countries
+  favorites: [],
 };
 
 const userSlice = createSlice({
@@ -12,11 +15,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
-      state.user = action.payload; // Set the user data (only relevant fields)
-
-      // Load user-specific favorites from local storage
-      const storedFavorites = JSON.parse(localStorage.getItem(`favorites_${state.user.uid}`)) || [];
-      state.favorites = storedFavorites; // Set the user's favorites from local storage
+      state.user = action.payload;
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
@@ -24,29 +23,48 @@ const userSlice = createSlice({
     setError: (state, action) => {
       state.error = action.payload;
     },
+    setFavorites: (state, action) => {
+      state.favorites = action.payload;
+    },
     logout: (state) => {
       state.user = null;
-      state.favorites = []; // Clear favorites on logout
-      localStorage.removeItem(`favorites_${state.user.uid}`);  // Remove user-specific favorites from local storage
+      state.favorites = [];
     },
-    // Add a country to favorites
     addFavorite: (state, action) => {
       const country = action.payload;
       if (!state.favorites.some(fav => fav.cca3 === country.cca3)) {
         state.favorites.push(country);
-        // Save to local storage with the user-specific key
-        localStorage.setItem(`favorites_${state.user.uid}`, JSON.stringify(state.favorites));
+
+        // Sync to Firestore
+        if (state.user) {
+          setDoc(doc(db, "favorites", state.user.uid), {
+            items: state.favorites
+          });
+        }
       }
     },
-    // Remove a country from favorites
     removeFavorite: (state, action) => {
-      state.favorites = state.favorites.filter(country => country.cca3 !== action.payload.cca3);
-      // Save to local storage with the user-specific key
-      localStorage.setItem(`favorites_${state.user.uid}`, JSON.stringify(state.favorites));
+      const country = action.payload;
+      state.favorites = state.favorites.filter(fav => fav.cca3 !== country.cca3);
+
+      // Sync to Firestore
+      if (state.user) {
+        setDoc(doc(db, "favorites", state.user.uid), {
+          items: state.favorites
+        });
+      }
     },
   },
 });
 
-export const { setUser, setLoading, setError, logout, addFavorite, removeFavorite } = userSlice.actions;
+export const {
+  setUser,
+  setLoading,
+  setError,
+  setFavorites,
+  logout,
+  addFavorite,
+  removeFavorite,
+} = userSlice.actions;
 
 export default userSlice.reducer;

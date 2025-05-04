@@ -1,16 +1,48 @@
-// src/main.jsx
-import { StrictMode } from 'react';
+import { StrictMode, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Provider } from 'react-redux';  // Import the Redux Provider
-import store from '../src/redux/store.js';  // Import your Redux store
-import './index.css';
-import App from './App.jsx';
+import { Provider, useDispatch } from 'react-redux';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import store from './redux/store';
+import App from './App';
+import { auth, db } from '../firebase';
+import { setUser, setFavorites } from './redux/userSlice';
+import './index.css'
 
-// Initialize React 18 and wrap the app with the Redux Provider
+const AuthLoader = ({ children }) => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userData = {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName || 'User',
+        };
+        dispatch(setUser(userData));
+
+        // Fetch favorites from Firestore
+        const docRef = doc(db, 'favorites', user.uid);
+        const docSnap = await getDoc(docRef);
+        const favorites = docSnap.exists() ? docSnap.data().items : [];
+
+        dispatch(setFavorites(favorites));
+      }
+    });
+
+    return () => unsubscribe();
+  }, [dispatch]);
+
+  return children;
+};
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <Provider store={store}>  {/* Wrap your App component with Provider */}
-      <App />
+    <Provider store={store}>
+      <AuthLoader>
+        <App />
+      </AuthLoader>
     </Provider>
-  </StrictMode>,
+  </StrictMode>
 );
