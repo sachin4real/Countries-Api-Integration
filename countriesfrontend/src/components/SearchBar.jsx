@@ -1,37 +1,29 @@
-import { useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import { useState } from "react";
 
-function SearchBar() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate();
+const SearchBar = ({ searchTerm = "", onSearchChange = () => {} }) => {
+  const [term, setTerm] = useState(searchTerm);
 
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const handleSearchSubmit = (event) => {
-    event.preventDefault();
-    if (searchTerm.trim()) {  // Ensure that the search term isn't empty
-      navigate(`/country/${searchTerm}`);
-    } else {
-      alert("Please enter a country name.");
-    }
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setTerm(value);
+    onSearchChange(value);
   };
 
   return (
-    <form onSubmit={handleSearchSubmit} className="w-full max-w-xs mb-6">
+    <div className="flex flex-col sm:flex-row gap-4">
       <input
         type="text"
-        className="w-full px-4 py-2 text-lg rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        value={term}
+        onChange={handleInputChange}
         placeholder="Search for a country..."
-        value={searchTerm}
-        onChange={handleSearchChange}
+        className="flex-1 px-4 py-3 rounded-md border border-gray-300 shadow-sm focus:ring-2 focus:ring-teal-500 focus:outline-none text-black"
       />
-      <button type="submit" className="mt-2 w-full bg-blue-600 text-white p-2 rounded-lg">
-        Search
-      </button>
-    </form>
+     <button className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-md hover:bg-teal-700 transition">
+  Search
+</button>
+
+    </div>
   );
-}
+};
 
 export default SearchBar;

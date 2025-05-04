@@ -14,6 +14,7 @@ function App() {
   return (
     <Router>
       <Navbar />
+      <div className="pt-10"> {/* Add padding to offset fixed navbar */}
       <Routes>
         {/* Home page route */}
         <Route path="/" element={<HomePage />} />
@@ -38,6 +39,7 @@ function App() {
         {/* Fallback page for unmatched routes */}
         <Route path="*" element={<ErrorPage />} />
       </Routes>
+      </div>
     </Router>
   );
 }

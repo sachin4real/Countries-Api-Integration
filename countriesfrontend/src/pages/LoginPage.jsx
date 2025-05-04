@@ -1,33 +1,29 @@
-// src/pages/LoginPage.jsx
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { loginUser } from "../redux/authActions"; // Assuming your action is in this file
+import { loginUser } from "../redux/authActions";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // Dispatch login action
       await dispatch(loginUser(email, password));
-
-      // Navigate to home page after login
-      navigate("/"); // This redirects to the home page
+      navigate("/");
     } catch (error) {
       console.error("Login failed", error);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-[#1B5D4C] to-[#5B7F72]">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-1/3">
-        <h2 className="text-3xl font-bold mb-6 text-center text-teal-600">Login</h2>
-        
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-[#1B5D4C] to-[#5B7F72] px-4">
+      <div className="bg-white w-full max-w-md p-6 sm:p-8 rounded-xl shadow-lg">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-teal-600">Login</h2>
+
         <form onSubmit={handleLogin}>
           <div className="mb-4">
             <input
@@ -58,7 +54,12 @@ const LoginPage = () => {
         </form>
 
         <div className="mt-4 text-center">
-          <p className="text-gray-600">Don't have an account? <a href="/register" className="text-teal-600 hover:underline">Register</a></p>
+          <p className="text-gray-600 text-sm">
+            Don't have an account?{" "}
+            <a href="/register" className="text-teal-600 hover:underline">
+              Register
+            </a>
+          </p>
         </div>
       </div>
     </div>
